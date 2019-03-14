@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.9//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "hou.mapper.LeaderMapper">
+
+	<!-- 选择全部 -->
+	<select id="selectAllLeaders" resultType="hou.bean.LeaderBean">
+		select * from leader
+	</select>
+	
+	<!-- 插入Leader -->
+	<insert id="insertLeader" parameterType="hou.bean.LeaderBean"  keyProperty="id"  useGeneratedKeys="true">
+		insert into leader(openid,name,state,time,pic,`desc`) VALUES(#{openid},#{name},#{state},#{time},#{pic},#{desc})
+	</insert>
+	
+	<!-- 根据openid选择logs -->
+	<select id = "selectLogByName" parameterType="String" resultType = "hou.bean.LogBean">
+		SELECT l.* FROM leader_log l ,leader d WHERE d.id = l.leader_id AND d.openid = #{openid}<!-- LIKE CONCAT('%',#{openid},'%') -->
+	</select>
+	
+	<!-- 查询openid被占用 -->
+	<select id = "selCountByName" parameterType="String" resultType = "java.lang.Integer">
+		select count(*) as num from leader where openid = #{openid}
+	</select>
+	
+	<!-- 插入Log -->
+	<insert id="insertLog" parameterType="hou.bean.LogBean" keyProperty="id" useGeneratedKeys="true">
+		insert into leader_log(leader_id,state,time,`desc`) VALUES(#{leader_id},#{state},#{time},#{desc})
+	</insert>
+	
+	<!-- 更新state -->
+	<update id="updateState" parameterType="java.lang.String" keyProperty="id"  useGeneratedKeys="true">
+		UPDATE leader SET state = #{state} ,`desc` = #{desc} WHERE openid = #{openid}
+	</update>
+	
+	<!-- 更新pic -->
+	<update id="updatePic" parameterType="java.lang.String" keyProperty="id"  useGeneratedKeys="true">
+		UPDATE leader SET pic = #{pic} WHERE name = #{name}
+	</update>
+	
+	<!-- 查询User表的openid被占用 -->
+	<select id = "selUserCountByOpenid" parameterType="String" resultType = "java.lang.Integer">
+		select count(*) as num from user where openid = #{openid}
+	</select>
+	
+	<!-- 查询User表的openid被占用 -->
+	<select id = "selectRoleByOpenid" parameterType="String" resultType="java.util.Map">
+		select role from user where openid = #{openid}
+	</select>
+	
+	<!-- 更新user -->
+	<update id="updateUser" parameterType="hou.bean.UserBean" keyProperty="id"  useGeneratedKeys="true">
+		UPDATE user SET nickName = #{nickName},province = #{province},language = #{language},gender = #{gender},country = #{country},city = #{city},avatarUrl = #{avatarUrl} WHERE openid = #{openid}
+	</update>
+	
+	<!-- 添加user -->
+	<update id="insertUser" parameterType="hou.bean.UserBean" keyProperty="id"  useGeneratedKeys="true">
+		insert into user(openid,session_key,unionid,role) VALUES(#{openid},#{session_key},#{unionid},#{role})
+	</update>
+	
+	<!-- 更新user的session_key  -->
+	<update id="updateSessionKey" parameterType="hou.bean.UserBean" keyProperty="id"  useGeneratedKeys="true">
+		UPDATE user SET session_key = #{session_key},unionid = #{unionid} WHERE openid = #{openid}
+	</update>
+	
+	<!-- 得到idByOpenid -->
+	<select id = "selidByOpenid" parameterType="String" resultType = "java.lang.Integer">
+		select id from leader where openid = #{openid}
+	</select>
+</mapper>
